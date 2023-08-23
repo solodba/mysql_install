@@ -24,6 +24,26 @@ var Cmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
+		err = svc.CreateMySQLDir(ctx)
+		if err != nil {
+			return err
+		}
+		err = svc.IsMySQLRun(ctx)
+		if err != nil {
+			return err
+		}
+		err = svc.CreateMySQLUser(ctx)
+		if err != nil {
+			return err
+		}
+		err = svc.ChangeMySQLDirPerm(ctx)
+		if err != nil {
+			return err
+		}
+		err = svc.InitialMySQL(ctx)
+		if err != nil {
+			return err
+		}
 		return nil
 	},
 }
