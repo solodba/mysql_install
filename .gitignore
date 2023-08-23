@@ -1,0 +1,22 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+# Test binary, built with `go test -c`
+*.test
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+*.idea
+*vendor
+*.log
+*.VSCodeCounter
+
+cover.out
+coverage.txt
+
+index.html
+etc/ssl
+mysql_install
+etc/mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz

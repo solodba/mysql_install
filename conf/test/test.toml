@@ -1,0 +1,9 @@
+[mysql]
+file_name = "mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz"
+install_path = "/usr/local/mysql"
+data_base = "/data/mysql"
+binlog_file_name = "binlog"
+data_file_name = "data"
+log_file_name = "log"
+tmp_file_name = "tmpdir"
+conf_file_name = "conf"
