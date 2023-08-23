@@ -17,7 +17,7 @@ func (i *impl) UnzipMySQLFile(ctx context.Context) error {
 		return fmt.Errorf("[%s]文件夹已经存在,请确定是否安装了MySQL", i.c.MySQL.InstallPath)
 	}
 	logger.L().Info().Msgf("正在解压MySQL压缩包")
-	cmd := exec.Command("xd", "-d", i.c.MySQL.FileName)
+	cmd := exec.Command("xz", "-d", i.c.MySQL.FileName)
 	_, err = cmd.Output()
 	if err != nil {
 		return fmt.Errorf("解压MySQL压程序失败: %v", err.Error())

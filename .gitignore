@@ -19,4 +19,4 @@ coverage.txt
 index.html
 etc/ssl
 mysql_install
-etc/mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz
+mysql-8.0.25-linux-glibc2.12-x86_64.tar.xz
