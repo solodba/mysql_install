@@ -3,15 +3,25 @@ package start
 import (
 	"context"
 
-	"github.com/solodba/mcube/apps"
-	"github.com/solodba/mysql_install/apps/mysql"
+	"github.com/solodba/mysql_install/protocol"
 	"github.com/spf13/cobra"
 )
 
 var (
-	svc = apps.GetInternalApp(mysql.AppName).(mysql.Service)
 	ctx = context.Background()
 )
+
+// MySQL服务结构体
+type Server struct {
+	MySQLInstallSvc *protocol.MySQLInstallSvc
+}
+
+// MySQL服务结构体初始化函数
+func NewServer() *Server {
+	return &Server{
+		MySQLInstallSvc: protocol.NewMySQLInstallSvc(),
+	}
+}
 
 // 项目启动子命令
 var Cmd = &cobra.Command{
@@ -20,27 +30,8 @@ var Cmd = &cobra.Command{
 	Long:    "mysql_install start service",
 	Example: "mysql_install start -f etc/config.toml",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		err := svc.UnzipMySQLFile(ctx)
-		if err != nil {
-			return err
-		}
-		err = svc.CreateMySQLDir(ctx)
-		if err != nil {
-			return err
-		}
-		err = svc.IsMySQLRun(ctx)
-		if err != nil {
-			return err
-		}
-		err = svc.CreateMySQLUser(ctx)
-		if err != nil {
-			return err
-		}
-		err = svc.ChangeMySQLDirPerm(ctx)
-		if err != nil {
-			return err
-		}
-		err = svc.InitialMySQL(ctx)
+		svc := NewServer()
+		err := svc.MySQLInstallSvc.MySQLInstall(ctx)
 		if err != nil {
 			return err
 		}
