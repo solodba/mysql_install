@@ -159,7 +159,7 @@ func (i *impl) StartMySQL(ctx context.Context) error {
 		return fmt.Errorf("执行命令失败, err: %s", err.Error())
 	}
 	pwdList := strings.Split(string(res), " ")
-	pwd := pwdList[len(pwdList)-1]
+	pwd := strings.TrimRight(pwdList[len(pwdList)-1], "\n")
 	_, err = os.Stat("/etc/init.d/mysql.server")
 	if err != nil {
 		cmd := exec.Command("cp", "mysql.server", "/etc/init.d/", "-rf")
@@ -182,13 +182,13 @@ func (i *impl) StartMySQL(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("执行命令失败, err: %s", err.Error())
 	}
-	fmt.Println("yes")
-	cmdStr = fmt.Sprintf(`source /etc/profile;mysql -uroot -p%s --connect-expired-password -e "alter user user() identified by 'Root@123';"`, pwd)
+	cmdStr = fmt.Sprintf(`source /etc/profile;mysql -uroot -p'%s' --connect-expired-password -e "alter user user() identified by 'Root@123';"`, pwd)
 	cmd = exec.Command("/bin/bash", "-c", cmdStr)
 	_, err = cmd.Output()
 	if err != nil {
 		return fmt.Errorf("执行命令失败, err: %s", err.Error())
 	}
+	logger.L().Info().Msgf("MySQL 8.0.25 安装完成")
 	return nil
 }
 
