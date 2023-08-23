@@ -117,10 +117,12 @@ func (i *impl) ChangeMySQLDirPerm(ctx context.Context) error {
 		return fmt.Errorf("执行命令失败, err: %s", err.Error())
 	}
 	cmd = exec.Command("chown", "-R", "mysql:mysql", i.c.MySQL.InstallPath)
+	_, err = cmd.Output()
 	if err != nil {
 		return fmt.Errorf("执行命令失败, err: %s", err.Error())
 	}
 	cmd = exec.Command("cp", "my.cnf", i.c.MySQL.ConfFilePath()+"/")
+	_, err = cmd.Output()
 	if err != nil {
 		return fmt.Errorf("执行命令失败, err: %s", err.Error())
 	}
@@ -150,5 +152,66 @@ func (i *impl) InitialMySQL(ctx context.Context) error {
 
 // 启动MySQL
 func (i *impl) StartMySQL(ctx context.Context) error {
+	cmdStr := fmt.Sprintf(`cat %s/mysql.err | grep 'temporary password'`, i.c.MySQL.LogFilePath())
+	cmd := exec.Command("/bin/bash", "-c", cmdStr)
+	res, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("执行命令失败, err: %s", err.Error())
+	}
+	pwdList := strings.Split(string(res), " ")
+	pwd := pwdList[len(pwdList)-1]
+	_, err = os.Stat("/etc/init.d/mysql.server")
+	if err != nil {
+		cmd := exec.Command("cp", "mysql.server", "/etc/init.d/", "-rf")
+		_, err = cmd.Output()
+		if err != nil {
+			return fmt.Errorf("执行命令失败, err: %s", err.Error())
+		}
+		cmd = exec.Command("chmod", "700", "/etc/init.d/mysql.server")
+		_, err = cmd.Output()
+		if err != nil {
+			return fmt.Errorf("执行命令失败, err: %s", err.Error())
+		}
+	}
+	err = i.AddEnv(ctx)
+	if err != nil {
+		return err
+	}
+	cmd = exec.CommandContext(ctx, "/bin/bash", "-c", "/etc/init.d/mysql.server start > /dev/null 2>&1")
+	_, err = cmd.Output()
+	if err != nil {
+		return fmt.Errorf("执行命令失败, err: %s", err.Error())
+	}
+	fmt.Println("yes")
+	cmdStr = fmt.Sprintf(`source /etc/profile;mysql -uroot -p%s --connect-expired-password -e "alter user user() identified by 'Root@123';"`, pwd)
+	cmd = exec.Command("/bin/bash", "-c", cmdStr)
+	_, err = cmd.Output()
+	if err != nil {
+		return fmt.Errorf("执行命令失败, err: %s", err.Error())
+	}
+	return nil
+}
+
+// 增加环境量变量
+func (i *impl) AddEnv(ctx context.Context) error {
+	cmdStr := fmt.Sprintf(`grep 'export PATH=$PATH:%s/bin' /etc/profile|wc -l`, i.c.MySQL.InstallPath)
+	cmd := exec.Command("/bin/bash", "-c", cmdStr)
+	res, err := cmd.Output()
+	if err != nil {
+		return fmt.Errorf("执行命令失败, err: %s", err.Error())
+	}
+	if strings.Trim(string(res), "\n") == "0" {
+		cmdStr = fmt.Sprintf(`echo "export PATH=\$PATH:%s/bin" >> /etc/profile`, i.c.MySQL.InstallPath)
+		cmd := exec.Command("/bin/bash", "-c", cmdStr)
+		_, err = cmd.Output()
+		if err != nil {
+			return fmt.Errorf("执行命令失败, err: %s", err.Error())
+		}
+		cmd = exec.Command("/bin/bash", "-c", `source /etc/profile`)
+		_, err = cmd.Output()
+		if err != nil {
+			return fmt.Errorf("执行命令失败, err: %s", err.Error())
+		}
+	}
 	return nil
 }

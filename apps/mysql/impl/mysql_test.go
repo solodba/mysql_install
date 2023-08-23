@@ -36,3 +36,10 @@ func TestInitialMySQL(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestStartMySQL(t *testing.T) {
+	err := svc.StartMySQL(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+}

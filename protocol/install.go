@@ -45,5 +45,9 @@ func (m *MySQLInstallSvc) MySQLInstall(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	err = m.svc.StartMySQL(ctx)
+	if err != nil {
+		return err
+	}
 	return nil
 }
