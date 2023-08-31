@@ -74,12 +74,12 @@ func (i *impl) CreateMySQLDir(ctx context.Context) error {
 
 // 判断是否有MySQL进程
 func (i *impl) IsMySQLRun(ctx context.Context) error {
-	cmd := exec.Command("/bin/bash", "-c", `ps -ef |grep mysqld |wc -l`)
+	cmd := exec.Command("/bin/bash", "-c", `ps -ef | grep mysqld | grep -v grep | wc -l`)
 	res, err := cmd.Output()
 	if err != nil {
 		return fmt.Errorf("执行命令失败, err: %s", err.Error())
 	}
-	if strings.Trim(string(res), "\n") != "2" {
+	if strings.Trim(string(res), "\n") != "0" {
 		return fmt.Errorf("有MySQL进程在运行, 请检查")
 	}
 	return nil
