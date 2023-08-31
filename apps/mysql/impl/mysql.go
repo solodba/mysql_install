@@ -79,7 +79,7 @@ func (i *impl) IsMySQLRun(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("执行命令失败, err: %s", err.Error())
 	}
-	if strings.Trim(string(res), "\n") != "1" {
+	if strings.Trim(string(res), "\n") != "2" {
 		return fmt.Errorf("有MySQL进程在运行, 请检查")
 	}
 	return nil
